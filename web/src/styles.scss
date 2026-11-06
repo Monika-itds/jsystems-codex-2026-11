@@ -1,0 +1,12 @@
+@use '@angular/material' as mat;
+html {
+  @include mat.theme((color: (primary: mat.$azure-palette), typography: system-ui, density: 0));
+  color-scheme: light;
+  --mat-sys-primary: #222222;
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-error: #a30319;
+}
+body { margin: 0; background: #f7f7f7; color: #1a1a1a; font: 16px/1.5 system-ui, sans-serif; }
+* { box-sizing: border-box; }
+a { color: #1c73e7; }
+button, input, textarea, select { font: inherit; }

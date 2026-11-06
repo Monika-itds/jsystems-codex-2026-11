@@ -1,0 +1,50 @@
+<main>
+  <header><p class="eyebrow">Staff assessment workspace</p><h1>Hardware Service Decision Copilot</h1></header>
+  <mat-card appearance="outlined"><mat-card-content>
+    <h2>Synthetic cases only</h2>
+    <p>Use fictional equipment cases and non-identifying images. Avoid faces, serial numbers, addresses and receipts.</p>
+    <p>Assessment supports staff review. Staff make every final decision under fictional demo rules.</p>
+  </mat-card-content></mat-card>
+
+  @for (epoch of [client.draftEpoch()]; track epoch) {
+    <section class="intake" [hidden]="client.phase() === 'result'">
+      <app-intake-form [busy]="client.busy" (submitAssessment)="submit($event)" />
+    </section>
+  }
+  <p class="actions">
+    <button type="button" mat-stroked-button [disabled]="client.clearing()" (click)="startNewCase()">Start new case</button>
+  </p>
+  @if (client.clearing()) { <p role="status">Clearing the current case...</p> }
+
+  @if (client.phase() === 'running') {
+    <p class="stage" role="status">Assessment stage: {{ stageLabel() }}</p>
+  }
+  @if (client.error(); as failure) {
+    <p class="error" role="alert">{{ failure.message }}</p>
+  }
+  @if (client.phase() === 'result') {
+    @if (client.result(); as result) {
+      <app-assessment-view [result]="result" />
+      @if (result.stage === 'completed') {
+        <app-chat-panel [result]="result" />
+      } @else {
+        <p class="chat-note">Chat is available after a completed assessment.</p>
+      }
+      <p class="actions">
+        <button type="button" mat-stroked-button (click)="editIntake()">Edit intake and reassess</button>
+      </p>
+      @if (client.previousResults().length) {
+        <mat-accordion>
+          @for (previous of client.previousResults(); track previous.revision) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>Superseded revision {{ previous.revision }} - read only</mat-panel-title>
+              </mat-expansion-panel-header>
+              <app-assessment-view [result]="previous" [superseded]="true" />
+            </mat-expansion-panel>
+          }
+        </mat-accordion>
+      }
+    }
+  }
+</main>

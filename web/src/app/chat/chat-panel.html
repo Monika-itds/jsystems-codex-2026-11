@@ -1,0 +1,34 @@
+<section class="chat" aria-label="Revision chat">
+  <h3>Ask about this assessment</h3>
+  <div class="turns" aria-live="polite">
+    @for (message of messages(); track message.id) {
+      <article class="message" [attr.data-role]="message.role">
+        <p class="author">{{ message.role === 'user' ? 'You' : 'Assistant' }}</p>
+        @for (part of message.parts; track $index) {
+          @if (part.type === 'text') {
+            <p class="text">{{ part.text }}</p>
+          }
+        }
+      </article>
+    }
+  </div>
+  @if (session(); as active) {
+    @if (active.busy) {
+      <p class="status" role="status">The assistant is writing the reply.</p>
+      <button type="button" mat-stroked-button (click)="stop()">Stop</button>
+    } @else if (active.retryable) {
+      <p class="status" role="status">The last turn did not finish.</p>
+      <button type="button" mat-stroked-button (click)="retry()">Retry the last question</button>
+    }
+    @if (active.errorMessage) {
+      <p class="error" role="alert">{{ active.errorMessage }}</p>
+    }
+    <form class="composer" (submit)="onSubmit($event)">
+      <mat-form-field>
+        <mat-label>Question about this assessment</mat-label>
+        <input matInput [formControl]="draft" maxlength="4000" autocomplete="off" />
+      </mat-form-field>
+      <button type="submit" mat-raised-button color="primary" [disabled]="draft.invalid || active.busy">Send</button>
+    </form>
+  }
+</section>

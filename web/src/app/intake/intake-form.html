@@ -1,0 +1,128 @@
+<form class="intake" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+  <h2>Equipment intake</h2>
+
+  <p class="notice">
+    Synthetic cases only: describe fictional equipment and avoid faces, readable serial numbers, addresses and
+    receipts. This is a manual reminder, not automated identity detection.
+  </p>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Case type</mat-label>
+    <mat-select id="intake-case-type" formControlName="caseType">
+      @for (option of caseTypeOptions; track option.value) {
+        <mat-option [value]="option.value">{{ option.label }}</mat-option>
+      }
+    </mat-select>
+    <mat-error>Choose return or complaint.</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Equipment category</mat-label>
+    <mat-select id="intake-category" formControlName="category">
+      @for (option of categoryOptions; track option.value) {
+        <mat-option [value]="option.value">{{ option.label }}</mat-option>
+      }
+    </mat-select>
+    <mat-error>Choose an equipment category.</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Equipment name or model</mat-label>
+    <input matInput id="intake-model" formControlName="model" type="text" autocomplete="off" />
+    <mat-error>
+      @if (modelControl.hasError('maxlength')) {
+        Equipment model is too long (200 characters maximum).
+      } @else {
+        Enter the equipment name or model.
+      }
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Purchase date</mat-label>
+    <input
+      matInput
+      id="intake-purchase-date"
+      formControlName="purchaseDate"
+      [matDatepicker]="purchaseDatepicker"
+      [max]="today()"
+      autocomplete="off"
+    />
+    <mat-datepicker #purchaseDatepicker />
+    <mat-error>
+      @if (purchaseDateControl.hasError('required')) {
+        Choose a purchase date.
+      } @else if (purchaseDateControl.hasError('futureDate')) {
+        Purchase date cannot be in the future.
+      } @else {
+        Enter a valid purchase date.
+      }
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Reason (required for complaints)</mat-label>
+    <textarea matInput id="intake-reason" formControlName="reason" rows="4"></textarea>
+    <mat-error>
+      @if (reasonControl.hasError('maxlength')) {
+        Reason is too long (4000 characters maximum).
+      } @else {
+        Enter a reason for the complaint.
+      }
+    </mat-error>
+  </mat-form-field>
+
+  <section class="image-section" aria-labelledby="intake-image-heading">
+    <h3 id="intake-image-heading">Equipment image</h3>
+    <p class="picker">
+      <label for="intake-image-file">Choose image</label>
+      <input
+        #fileInput
+        id="intake-image-file"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        aria-describedby="intake-image-help"
+        [disabled]="busy()"
+        (change)="onFileSelected($event)"
+      />
+    </p>
+    <p class="hint" id="intake-image-help" aria-live="polite">
+      {{ imageError() ?? 'JPEG, PNG or WebP, up to 10 MB, exactly one file.' }}
+    </p>
+
+    @if (previewUrl(); as url) {
+      <figure class="preview">
+        <img [src]="url" alt="Preview of the selected equipment image" width="160" height="160" />
+        <figcaption>{{ selectedImage()?.name }}</figcaption>
+      </figure>
+    }
+
+    <div class="image-actions">
+      <button
+        type="button"
+        id="intake-replace-image"
+        [disabled]="busy() || !selectedImage()"
+        (click)="replaceImage()"
+      >
+        Replace image
+      </button>
+      <button
+        type="button"
+        id="intake-remove-image"
+        [disabled]="busy() || !selectedImage()"
+        (click)="removeImage()"
+      >
+        Remove image
+      </button>
+    </div>
+  </section>
+
+  <p class="status" id="intake-status" role="status">{{ status() }}</p>
+
+  <div class="actions">
+    <button mat-flat-button type="submit" id="intake-submit" [disabled]="busy()">Submit intake</button>
+    <button mat-button type="button" id="intake-cancel" [disabled]="busy()" (click)="cancelled.emit()">
+      Cancel
+    </button>
+  </div>
+</form>

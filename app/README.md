@@ -1,5 +1,7 @@
 # App
 
+The approved Hardware Service Decision Copilot uses `../web/` for Angular Material and `../api/` for the Next.js backend. This folder is the original course placeholder; the checklist below is historical scaffolding guidance. Follow `../docs/plans/hardware-assessment-chat-implementation-plan.md` and `../docs/workflow-checklist.md` for current scope and verification status.
+
 This folder will contain AI Chat, built during the course with TypeScript, React and the Vercel AI SDK on the server and client. It currently contains no application or package manifest. Participants may choose their own idea through the same process.
 
 ## How to start

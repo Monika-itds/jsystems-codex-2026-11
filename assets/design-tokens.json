@@ -1,0 +1,198 @@
+{
+  "metadata": {
+    "source": "https://www.x-kom.pl/",
+    "capturedAt": "2026-11-05",
+    "method": "Playwright CLI, headed Google Chrome, computed styles and root CSS custom properties",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "scope": "Desktop homepage after dismissing cookie consent. Seasonal banners are not permanent brand tokens.",
+    "limitations": [
+      "Mobile layouts and component interaction states were not exercised.",
+      "Error and overlay colors come from published CSS variables, not a triggered error or open modal."
+    ],
+    "mappings": {
+      "colors.brand.primary": "--color-brand700; this is a brand accent, while the measured primary CTA is neutral800",
+      "colors.brand.error": "--color-textDanger",
+      "colors.background.overlay": "--color-transparentBlack48",
+      "typography.fontWeights": "400, 600 and 700 observed; variable font declares range 400-700",
+      "spacing": "Observed gap/padding values normalized into a reusable scale; 4px base is an inference, with 2px exceptions",
+      "borderRadius": "Values published in root CSS; 4px, 8px, 12px and 100% also observed on visible elements"
+    }
+  },
+  "colors": {
+    "brand": {
+      "primary": "#0082fa",
+      "accent": "#fa0064",
+      "purple": "#8250fa",
+      "cyan": "#0fd2ff",
+      "error": "#A30319",
+      "success": "#007d00",
+      "warning": "#946A00"
+    },
+    "background": {
+      "default": "#ffffff",
+      "light": "#f7f7f7",
+      "input": "#f2f2f2",
+      "overlay": "rgba(0,0,0,0.48)",
+      "success": "#eef7ed",
+      "purple": "#f4f0ff"
+    },
+    "text": {
+      "primary": "#1a1a1a",
+      "secondary": "#6e6e6e",
+      "alternative": "#444444",
+      "muted": "#6e6e6e",
+      "onDark": "#ffffff",
+      "link": "#1c73e7",
+      "linkHover": "#004fe1",
+      "linkActive": "#003fcd",
+      "linkVisited": "#6000b0"
+    },
+    "border": {
+      "default": "#949494",
+      "muted": "#ebebeb",
+      "selected": "#1a1a1a"
+    },
+    "action": {
+      "primary": "#222222",
+      "strong": "#1a1a1a"
+    },
+    "logo": {
+      "1": "#8250fa",
+      "2": "#c382fa",
+      "3": "#be0064",
+      "4": "#0fd2ff",
+      "5": "#0082fa",
+      "6": "#fa0064"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "primary": "\"Instrument Sans\", sans-serif"
+    },
+    "fontFaces": [
+      {
+        "family": "Instrument Sans",
+        "src": "fonts/instrument-sans/InstrumentSans-VariableFont_wdth,wght.woff2",
+        "format": "woff2",
+        "style": "normal",
+        "weight": "400 700",
+        "display": "swap",
+        "variationSettings": "\"wdth\" 100"
+      }
+    ],
+    "fontWeights": {
+      "regular": 400,
+      "semibold": 600,
+      "bold": 700
+    },
+    "fontSize": {
+      "xs": "10px",
+      "sm": "12px",
+      "label": "13px",
+      "base": "14px",
+      "md": "16px",
+      "lg": "18px",
+      "xl": "20px",
+      "price": "24px",
+      "heading": "26px",
+      "display": "28px"
+    },
+    "lineHeight": {
+      "base": "20px",
+      "heading": "32px",
+      "bodyComputed": "normal"
+    }
+  },
+  "spacing": {
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "5": "20px",
+    "6": "24px",
+    "8": "32px",
+    "12": "48px",
+    "half": "2px"
+  },
+  "borderRadius": {
+    "none": "0px",
+    "tiny": "2px",
+    "sm": "4px",
+    "md": "8px",
+    "r9": "9px",
+    "r10": "10px",
+    "lg": "12px",
+    "r14": "14px",
+    "r16": "16px",
+    "r18": "18px",
+    "r20": "20px",
+    "r24": "24px",
+    "r28": "28px",
+    "full": "512px",
+    "circle": "100%"
+  },
+  "components": {
+    "button": {
+      "primary": {
+        "backgroundColor": "#222222",
+        "color": "#ffffff",
+        "padding": "12px 24px",
+        "borderRadius": "8px",
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "border": "none"
+      },
+      "promo": {
+        "backgroundColor": "transparent",
+        "color": "#ffffff",
+        "padding": "5px 11px",
+        "borderRadius": "8px",
+        "fontSize": "13px",
+        "border": "1px solid rgba(255,255,255,0.48)"
+      }
+    },
+    "header": {
+      "backgroundColor": "#ffffff",
+      "padding": "0px",
+      "fontSize": "14px",
+      "mainRowHeight": "72px"
+    },
+    "nav": {
+      "color": "#1a1a1a",
+      "fontSize": "16px",
+      "fontWeight": 400,
+      "height": "58px"
+    },
+    "input": {
+      "backgroundColor": "#f2f2f2",
+      "borderRadius": "8px",
+      "height": "40px",
+      "border": "none",
+      "textColor": "#1a1a1a",
+      "fontSize": "14px",
+      "lineHeight": "20px",
+      "padding": "8px 0px 8px 20px"
+    },
+    "section": {
+      "backgroundColor": "#ffffff",
+      "borderRadius": "12px",
+      "padding": "24px"
+    },
+    "promoBar": {
+      "backgroundColor": "#222222",
+      "color": "#ffffff",
+      "height": "40px",
+      "lineHeight": "20px"
+    },
+    "badge": {
+      "backgroundColor": "#eef7ed",
+      "color": "#007d00",
+      "borderRadius": "4px",
+      "padding": "2.5px 4px 1.5px",
+      "fontSize": "13px"
+    }
+  }
+}

@@ -1,0 +1,135 @@
+<article class="assessment-view" [attr.aria-labelledby]="sectionId() + '-heading'">
+  @if (superseded()) {
+    <p class="superseded" role="status">Superseded older revision - read only</p>
+    <h2 [id]="sectionId() + '-heading'">Older assessment result</h2>
+  } @else {
+    <h2 [id]="sectionId() + '-heading'">Current assessment result</h2>
+  }
+
+  <mat-card appearance="outlined" class="status-card" aria-live="polite">
+    <mat-card-content>
+      <h3 class="status-title">{{ statusTitle }}</h3>
+      @if (result().stage === 'interrupted') {
+        <p class="interrupted">Assessment interrupted. The structured result remains visible for staff review.</p>
+      }
+      <p>{{ result().policy.advisory }}</p>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card appearance="outlined">
+    <mat-card-content>
+      <h3>Case summary</h3>
+      <dl class="summary-grid">
+        <dt>Case type</dt><dd>{{ caseTypeLabel(result().intake.caseType) }}</dd>
+        <dt>Equipment category</dt><dd>{{ categoryLabel(result().intake.category) }}</dd>
+        <dt>Model or equipment name</dt><dd>{{ result().intake.model }}</dd>
+        <dt>Purchase date</dt><dd>{{ result().intake.purchaseDate }}</dd>
+        <dt>Assessment</dt><dd>Revision {{ result().revision }} - {{ result().assessmentDate }} ({{ result().timeZone }})</dd>
+        @if (result().intake.reason) {
+          <dt>Reported reason or fault</dt><dd>{{ result().intake.reason }}</dd>
+        }
+      </dl>
+    </mat-card-content>
+  </mat-card>
+
+  @if (result().policy.blockers.length) {
+    <mat-card appearance="outlined" class="review-card">
+      <mat-card-content>
+        <h3>Reasons requiring staff review</h3>
+        <ul>
+          @for (blocker of result().policy.blockers; track $index) {
+            <li>
+              <p>{{ blocker.message }}</p>
+              @if (blocker.observationIds.length) {
+                <p>Related findings: {{ blocker.observationIds.map(observationName).join(', ') }}</p>
+              }
+            </li>
+          }
+        </ul>
+        <h4>Staff next steps</h4>
+        <ul>
+          @for (step of result().policy.nextSteps; track $index) { <li>{{ step }}</li> }
+        </ul>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <h3>Staff next steps</h3>
+        <ul>@for (step of result().policy.nextSteps; track $index) { <li>{{ step }}</li> }</ul>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>Assessment evidence and limitations</mat-panel-title>
+    </mat-expansion-panel-header>
+    <p class="limit-note">{{ singleImageLimit }}</p>
+    <h3>Initial observations</h3>
+    <div class="observation-list">
+      @for (observation of result().initialObservations; track observation.id) {
+        <section class="observation" [attr.aria-labelledby]="sectionId() + '-finding-' + observation.id">
+          <h4 [id]="sectionId() + '-finding-' + observation.id">{{ observationName(observation.id) }}: {{ labelText(observation.label) }}</h4>
+          <dl class="evidence-grid">
+            <dt>Raw probability</dt><dd>{{ probabilityText(observation.rawProbability) }}</dd>
+            <dt>Usable probability</dt><dd>{{ usableProbabilityText(observation) }}</dd>
+            <dt>Source and model</dt><dd>{{ provenanceText(observation) }}</dd>
+          </dl>
+          <p class="evidence-text">{{ observation.evidence || noRationale }}</p>
+          @if (observation.limitations.length) {
+            <h5>Limitations</h5>
+            <ul>@for (limitation of observation.limitations; track $index) { <li>{{ limitation }}</li> }</ul>
+          }
+        </section>
+      }
+    </div>
+
+    @if (result().detailedAnalysis; as detail) {
+      <h3>Detailed analysis</h3>
+      @if (detail.conflicts) { <p class="review-note">Detailed analysis reports conflicting visual evidence.</p> }
+      @if (detail.findings.length) {
+        <div class="observation-list">
+          @for (finding of detail.findings; track finding.id) {
+            <section class="observation" [attr.aria-labelledby]="sectionId() + '-detail-' + finding.id">
+              <h4 [id]="sectionId() + '-detail-' + finding.id">{{ observationName(finding.id) }}: {{ labelText(finding.label) }}</h4>
+              <p>{{ finding.evidence || 'No specific visible evidence returned for this finding.' }}</p>
+              @if (finding.limitations.length) {
+                <h5>Limitations</h5>
+                <ul>@for (limitation of finding.limitations; track $index) { <li>{{ limitation }}</li> }</ul>
+              }
+            </section>
+          }
+        </div>
+      }
+      @if (detail.unsupportedConditions.length) {
+        <h4>Conditions outside supported visual criteria</h4>
+        <ul>@for (condition of detail.unsupportedConditions; track $index) { <li>{{ condition }}</li> }</ul>
+      }
+      @if (detail.limitations.length) {
+        <h4>Analysis limitations</h4>
+        <ul>@for (limitation of detail.limitations; track $index) { <li>{{ limitation }}</li> }</ul>
+      }
+    }
+
+    @if (result().image.warnings.length) {
+      <h3>Prepared image warnings</h3>
+      <ul>@for (warning of result().image.warnings; track $index) { <li>{{ warning }}</li> }</ul>
+    }
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>Version and model details</mat-panel-title>
+    </mat-expansion-panel-header>
+    <dl class="summary-grid">
+      <dt>Question set</dt><dd>{{ result().versions.questions }}</dd>
+      <dt>Threshold version</dt><dd>{{ result().versions.thresholds }}</dd>
+      <dt>Image preparation</dt><dd>{{ result().versions.preparation }}</dd>
+      <dt>Policy version</dt><dd>{{ result().versions.policy }}</dd>
+      <dt>Decisions model</dt><dd>{{ result().versions.decisionsModel || 'Not recorded' }}</dd>
+      <dt>Detailed analysis model</dt><dd>{{ result().versions.visionModel || 'Not recorded' }}</dd>
+      <dt>Explanation model</dt><dd>{{ result().versions.llmModel || 'Not recorded' }}</dd>
+    </dl>
+  </mat-expansion-panel>
+</article>

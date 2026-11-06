@@ -1,111 +1,32 @@
-# Repository Guidelines
+Be casual, not formal, but still professional.
 
-## Project
+Be concise! Provide short answers unless I ask for more details. I prefer step-by-step instructions that are straight to the point. Never repeat the same information.
 
-This is a **course project** for the "Codex - od zera do zespołu agentów AI" training organized by JSystems, 3 days (4-6.11.2026), remote on Windows 11 VMs. The primary taught agent is OpenAI Codex (CLI 0.166.0, desktop app, IDE extension, Codex Cloud), with Claude Code as a comparison. The group builds AI Chat in `app/`: TypeScript, Vercel AI SDK on backend and frontend, streaming, React `useChat`. Participants may choose their own idea with the same process: research -> PRD -> ADR -> plan -> implementation with agents.
+You may provide your opinions on topics but always make it clear that this is your opinion, not a fact. When you don't know, just say that you don't know.
 
-This is only the **base starting repository** for the course; concrete decisions are made live with the group.
+GitHub CLI (`gh`) is available and authenticated.
 
-Chat in Polish unless the user asks for another language. Repository documentation uses English unless another project language is agreed. Use full Polish diacritics and ASCII punctuation in prose. Use only synthetic data; never read or publish secrets, participant data or customer records.
+## Documentation research
 
-**Key docs** (created during the course - load only when in doubt):
-- `docs/PRD.md` - product requirements and acceptance criteria
-- `docs/ADR/` - Architecture Decision Records
-- `docs/design-guidelines.md` - design system and tokens
+- Delegate every research task, documentation lookup and internet information search to a research subagent; use Luna (`gpt-6-luna`) by default. The orchestrator defines the exact question, scope and evidence needed before delegating.
+- Luna only searches, collects and reports evidence. Request a detailed report with source links, relevant versions/dates, findings, conflicts, gaps and uncertainty. Luna must not choose an option, recommend a final decision, change architecture or implement changes as part of research.
+- Sol is the decision-making orchestrator: evaluate the research report, request follow-up research when needed, and make and explain the final decision. Do not silently substitute a research worker for Sol or claim that a different model is Sol; disclose model unavailability.
+- The research agent follows the source order below; the orchestrator delegates follow-up lookups instead of performing the research itself.
 
----
+- For library, framework, SDK and service documentation, use Context7 first: resolve the library ID, then query the relevant topic. Search the web only when Context7 cannot answer the question or lacks the required current detail; state the gap and prefer official sources.
+- For CLI tools, start with the installed tool's built-in help, then the relevant subcommand's `--help` (for example, `gh --help` and `gh pr view --help`). Use Context7 if help is insufficient, and web search only as the last resort.
+- Honor explicit requests to read particular sources. Verify repository-specific facts in the owning source; documentation is not evidence that an integration works locally.
 
-## Repository Layout
+## ADRs, planning and delegation
 
-```
-app/                 Application built during the course (start: empty scaffold)
-assets/              Design tokens, logo, favicon
-docs/                PRD, ADR, design system
-course-materials/    Notes, scripts, examples, research
-```
+- During ADR work, use the research delegation policy above to collect evidence about alternatives. Luna reports the evidence; Sol chooses the architecture and owns the final recommendation.
+- Prepare implementation plans with multiple subagents. Assign bounded, lower-complexity work to Luna and complex implementation of the agreed architecture, policy/provider/protocol work and independent integration review to Terra. Sol retains all architecture decisions. The orchestrator decides assignments by task complexity, records dependencies and gives each file area one owner. Use available model IDs; disclose unavailable workers rather than silently substituting them.
+- Prefer Luna and configured OpenCode Xiaomi MiMo workers for bounded implementation and test-writing. Include explicit headless MiMo work in the implementation plan, verified CLI syntax, chosen model/provider, invocation/time or confirmed spend limits and evidence-based escalation. Sol prepares briefs and accepts results; independent capable review and human final acceptance remain required. Workers cannot change architecture/scope or accept their own work, and only the coordinator performs Git writes.
+- Before implementing or initializing the app, independently review AGENTS.md, PRD, ADRs and Plan together, fix inconsistencies, and obtain plan approval. Do not count fixtures as completed provider integrations; include separate live smoke checks.
+- Project documentation starts at [docs/README.md](docs/README.md).
 
-**Do not read `course-materials/` on your own.** It holds teaching examples from this and earlier courses: sample PRDs, ADRs, prompts and agent instructions. They are not requirements or conventions for this app. Do not browse, search or index it during normal work; open a file there only when the user names it or asks for course material.
+## Language and data handling
 
----
-
-**`README.md` is the participant entry page.** Do not add an update-notes section, changelog or "what's new" list to its top before the course has started. During the course the trainer adds update notes there; add them only when the trainer asks.
-
----
-
-## Agent Workflow
-
-### When implementing new or refactoring functionality
-1. Read the relevant PRD and ADR files for the affected area.
-2. Define the expected behavior from the specification before writing or changing any code.
-3. Confirm the actual application checkout and inspect source, build descriptors, call sites and dependencies before proposing commands or APIs. Identify build, test and startup commands from that project, using its wrapper when available; do not assume a framework, build tool or runtime version.
-4. Establish missing or ambiguous requirements with the user and record agreed application scope in its PRD before implementation. Routine course-document changes do not need an application PRD or ADR.
-5. Verify library APIs against current documentation with Context7 (`resolve-library-id`, then `query-docs`). Match examples to the installed package version; AI SDK 7 differs from older releases.
-6. Use the project's selected package manager and actual shell (PowerShell on participant VMs). Inspect `package.json` before choosing commands. Do not scaffold a finished app before the PRD and ADR exercise.
-
-### TDD Rules
-For every feature and bug fix:
-1. Start from the specification, not the existing implementation.
-2. Write or extend tests **before** production code.
-3. Run the new tests and confirm they fail for the expected reason.
-4. Implement the minimum code needed to make them pass.
-5. Run the full verification suite for the changed scope.
-6. Refactor only while tests stay green.
-7. **Manually validate the running application** (see Manual QA below). Automated tests, including E2E, can produce false passes; exercise the real app too.
-
-If the area has no suitable test infrastructure yet, add it as part of the task - do not silently skip tests.
-
-For unit/integration LLM tests, use the installed AI SDK's synthetic mock model and streaming helpers without an API key; verify their types in current docs. Do not replace the real application endpoint or streaming protocol. For other endpoint/database mocks, first capture a fresh authorized local/test response using synthetic data. Save status, headers and body, or rows and schema, with date, target and service version, excluding secrets. Derive mocks from that capture; report a missing safe capture instead of inventing a response shape.
-
-For behavior-preserving legacy refactoring, write characterization tests against the original code and get them green before changing it. Assert observable inputs, outputs, state changes and errors rather than private methods or the current class layout. Demonstrate that critical assertions detect a controlled behavioral mutation, then revert that mutation. Existing tests may protect a pure refactor; a new behavior or bug fix still requires Red -> Green -> Refactor.
-
-Investigate production code and fixtures before changing a failing assertion. Do not weaken, disable or delete tests to conceal a defect. Change expected behavior only when the specification supports it, and explain why.
-
-### Manual QA (required after every task that affects the running app)
-
-Use the application's actual runtime and verified commands. The browser flow below applies to web applications; desktop applications need their real UI, and command-line tools need observable CLI checks.
-
-Use **Playwright CLI or the configured Playwright MCP** to drive the real running app like a human tester:
-
-1. Start the app with its verified project command and open it in the browser. Record successful startup separately from compilation and test execution.
-2. Take a screenshot of every screen you touched.
-3. Exercise the changed flow end-to-end: open the chat, send a message, check streaming and errors, and test any additional agreed features.
-4. Verify the flow actually works: correct navigation, correct data displayed, no console errors, Polish UI text.
-5. Compare screenshots with the agreed brand reference and `docs/design-guidelines.md` once created. Do not invent a reference when the greenfield scaffold has none.
-6. Report what you validated (steps + screenshots) in your task summary. If anything looks or behaves wrong, fix it before committing.
-
-### Verification (required before every commit)
-
-Verify only the scope relevant to your change. If the change affects runtime behavior, confirm the app starts correctly.
-
-**Test Strategy:**
-| Type | Mocks | Who |
-|---|---|---|
-| Unit | All deps | be/fe-dev |
-| Integration | Only external LLM API | be-dev |
-| E2E | NOTHING (real stack) | qa-engineer |
-
-**Verification:** For runtime changes, start the real application and finish with Manual QA. Record compilation/build, test execution and startup as separate checks, including discovery counts and skips. A successful build or E2E run alone does not establish that the app works. Documentation-only changes use diff, link and consistency checks and do not require application startup. Fix errors and warnings introduced by the change; report pre-existing failures without hiding them.
-
-**Env Vars:** See `.env.example`. `OPENROUTER_API_KEY` is server-only and needed for live OpenRouter calls, not synthetic unit/integration tests. Set `LLM_MODEL` to the provider's actual model ID during the configuration exercise. Store real values locally using the framework's agreed loader. Never expose a key in a client bundle, prompt or commit. Full E2E uses the real model; report missing credentials as blocked E2E, not a pass with mocks.
-
-### Sub-agents
-- Add `be-developer`, `fe-developer` and `qa-engineer` under `.codex/agents/` during the taught exercise; the starting repository has no active custom roles.
-- Delegate bounded tasks with explicit dependencies and disjoint file ownership. The coordinating agent reviews diffs and verification evidence before committing.
-
-### Commit Rules
-- Commit only after verification passes and the changed scope is in a working state.
-- Keep commits focused: one verified logical change per commit. Inspect `git status` and stage named paths; never use blanket staging.
-- Format: `Area: short summary` (e.g. `Backend:`, `Frontend:`, `Docs:`)
-- Do **not** push to remote unless the user explicitly asks.
-
-### Git Worktrees
-- Use this checkout by default. Ask before creating any worktree unless the user explicitly requested one, including for parallel agent work.
-- Remove worktrees with `git worktree remove <path>` and run `git worktree prune` when done.
-
-### Completion Criteria
-A task is complete only when:
-- Implementation matches the relevant PRD, ADR, and design guidance
-- Tests were written first and pass honestly
-- Verification for the changed scope passed with no errors or warnings
-- Runtime changes passed Manual QA on the actual UI, CLI or API, with screenshots or command/request evidence and the application's own visual reference where applicable; documentation-only work passed its scoped checks
-- The commit message is focused and the repository is in a consistent, reviewable state
+- Use English only for chat, reasoning and repository documentation.
+- Use ASCII punctuation in prose. Preserve full Polish diacritics in any retained Polish names or quotations; do not replace Polish letters with ASCII approximations.
+- Use only synthetic data. Never read or publish secrets, participant data or customer records. Do not inspect secret files or include sensitive values in prompts, reports, logs or documentation.

@@ -1,0 +1,10 @@
+main { max-width: 1120px; margin: 0 auto; padding: 32px 24px; }
+header { margin-bottom: 24px; }
+h1 { font-size: clamp(1.6rem, 4vw, 2rem); line-height: 1.2; }
+.eyebrow { color: #444; }
+mat-card-content { padding: 24px; }
+.intake { margin-top: 24px; }
+.stage, .chat-note { margin: 16px 0 0; }
+.error { margin: 16px 0 0; color: #a30319; }
+.actions { margin: 24px 0 0; }
+@media (max-width: 600px) { main { padding: 24px 16px; } }
